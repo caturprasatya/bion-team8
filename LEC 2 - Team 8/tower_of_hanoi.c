@@ -72,7 +72,7 @@ int main() {
             .name = 'B',
             .top = -1,
         },
-    {
+        {
             .name = 'C',
             .top = -1,
         }
