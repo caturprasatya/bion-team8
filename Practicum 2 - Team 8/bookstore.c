@@ -339,6 +339,106 @@ void saveBookToFile(const Book* book) {
     fclose(file);
 }
 
+
+// fungsi untuk viewHistory
+void viewHistory() {
+    FILE *file = fopen("history.txt", "r");
+    if (file == NULL) {
+        printf("%sBelum terdapat transaksi!  (file history.txt not found)%s\n", RED, RESET);
+        return;
+    }
+
+    char line[256];
+    printf("\n%s===== RIWAYAT TRANSAKSI =====%s\n", CYAN, RESET);
+    printSeparator('-');
+    printf("%-20s %-10s %-30s %-10s %-10s\n", "Waktu", "Kode Buku", "Nama Buku", "Jumlah", "Total");
+    printSeparator('-');
+
+    while (fgets(line, sizeof(line), file)) {
+        char time[25], codeBook[10], nameBook[MAX_STRING];
+        int quantity;
+        float total;
+
+        // sscanf untuk memiliah data dari line
+        sscanf(line, "%[^,],%[^,],%[^,],%d,%f", time, codeBook, nameBook, &quantity, &total);
+        
+        // mnampilkan data yang telah dipilah
+        printf("%-20s %-10s %-30s %-10d %-10s\n", time, codeBook, nameBook, quantity, formatCurrency(total));
+    }
+
+    fclose(file);
+    printSeparator('-');
+}
+
+
+// fungsi untuk deleteHistory
+void deleteHistory() {
+    FILE *file = fopen("history.txt", "r");
+    if (file == NULL) {
+        printf("%sFile history.txt tidak ditemukan!%s\n", RED, RESET);
+        return;
+    }
+
+    // membaca semua history ke dalam array
+    char lines[100][256]; // bisa disesuaikan sesuai kebutuhan
+    int count = 0;
+
+    while (fgets(lines[count], sizeof(lines[count]), file) && count < 100) {
+        count++;
+    }
+    fclose(file);
+
+    // untuk menampilkan history
+    printf("\n%s===== RIWAYAT TRANSAKSI =====%s\n", CYAN, RESET);
+    printSeparator('-');
+    printf("%-3s %-20s %-10s %-30s %-10s %-10s\n", "No", "Waktu", "Kode Buku", "Nama Buku", "Jumlah", "Total");
+    printSeparator('-');
+
+    for (int i = 0; i < count; i++) {
+        char time[25], codeBook[10], nameBook[MAX_STRING];
+        int quantity;
+        float total;
+
+        sscanf(lines[i], "%[^,],%[^,],%[^,],%d,%f", time, codeBook, nameBook, &quantity, &total);
+        printf("%-3d %-20s %-10s %-30s %-10d %-10s\n", i + 1, time, codeBook, nameBook, quantity, formatCurrency(total));
+    }
+
+    // Meminta input index untuk dihapus
+    char input[10];
+    int index = 0;
+    while (1) {
+        printf("Nomor index yang dihapus: ");
+        fgets(input, sizeof(input), stdin);
+        
+        // Cek apakah input kosong
+        if (input[0] == '\n') {
+            printf("%sInput tidak valid!%s\n", RED, RESET);
+            continue;
+        }
+
+        // mengonversi input string menjadi integer
+        index = atoi(input);
+
+        // validasi input
+        if (index >= 1 && index <= count) {
+            break; // Input valid
+        } else {
+            printf("%sInput tidak valid!%s\n", RED, RESET);
+        }
+    }
+
+    // menghapus data sesuai index yang dipilih
+    file = fopen("history.txt", "w"); // Membuka file untuk menulis ulang
+    for (int i = 0; i < count; i++) {
+        if (i != index - 1) { // jika bukan index yang dihapus
+            fprintf(file, "%s", lines[i]);
+        }
+    }
+    fclose(file);
+
+    printf("%sData berhasil dihapus%s\n", GREEN, RESET);
+}
+
 /*
  * Fungsi inputTransaction:
  * Memproses transaksi pembelian buku.
@@ -450,9 +550,11 @@ int main() {
         switch (choice) {
             case 1: addBook(bookList, &totalBooks); break;
             // Todo: Menambahkan menu yang belum ada
-            // view_history();
+            case 2: viewHistory(); break; 
+            // History: Menampilkan history Transaksi
             // view_book;
-            // delete_history;
+            case 4: deleteHistory(); break;
+            // Detele History:  Menghapus history Transaksi berdasarkan index
             // delete_book;
             case 6:
                 clearScreen();
@@ -460,7 +562,7 @@ int main() {
                 printf("%sTerima kasih telah menggunakan aplikasi!%s\n\n", GREEN, RESET);
                 return 0;
             // Menu 7 ini inisiatif dari kelompok kami, dikarenakan didalam soal tidak ada perintah untuk input transaksi
-            // memiliki kemungkinan tidak akan adanya update data transaksi terjadi.
+            // Terdapat kemungkinan tidak akan adanya update data transaksi terjadi.
             case 7: inputTransaction(bookList, totalBooks); break;
             default: 
                 printf("Menu yang anda masukan tidak tersedia!!");
