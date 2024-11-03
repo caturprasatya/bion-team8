@@ -375,7 +375,7 @@ void viewHistory() {
 void deleteHistory() {
     FILE *file = fopen("history.txt", "r");
     if (file == NULL) {
-        printf("%sFile history.txt tidak ditemukan!%s\n", RED, RESET);
+        printf("%sBelum terdapat transaksi!  (file history.txt not found)%s\n", RED, RESET);
         return;
     }
 
