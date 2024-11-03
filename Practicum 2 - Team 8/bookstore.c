@@ -55,9 +55,17 @@ void getCurrentTime(char *time);
 // Core functionality
 void inputTransaction(Book *bookList, int totalBooks);
 void addBook(Book *bookList, int *totalBooks);
-// void view_history();
 
-// Utilitas fungsi, membersihkan tampilan output
+/*
+ * Fungsi clearScreen:
+ * Membersihkan output pada layar konsol sehingga memberikan tampilan yang lebih rapi.
+ *
+ * Parameter: 
+ *   Tidak ada
+ *
+ * Return:
+ *   Tidak ada
+*/
 void clearScreen() {
     #ifdef _WIN32
         system("cls");
@@ -66,7 +74,16 @@ void clearScreen() {
     #endif
 }
 
-// Template header, untuk mengatasi redundant pada code
+/*
+ * Fungsi printHeader:
+ * Mencetak header dengan format yang konsisten dan menghindari redundant pada kode
+ *
+ * Parameter:
+ *   title - String judul yang akan ditampilkan
+ *
+ * Return:
+ *   Tidak ada
+*/
 void printHeader(const char* title) {
     clearScreen();
     printSeparator('=');
@@ -74,15 +91,33 @@ void printHeader(const char* title) {
     printSeparator('=');
 }
 
-// Untuk memberikan batas pada menu atau tampilan output pada menu, kita sering menggunaka simbol "-", "=" dll.
-// Karena proses itu cukup memakan waktu dan panjangnya harus sama, fungsi ini akan mempermudah kasus tersebut
+/*
+ * Fungsi printSeparator:
+ * Untuk memberikan batas pada menu atau tampilan output dengan menggunakan simbol, penggunaan simbol seperti "-", "=",  dll.
+ * Menggunakan warna kuning untuk pembatas dan mencetak sebanyak 12 karakter.
+ *
+ * Parameter:
+ *   symbol - Karakter yang digunakan sebagai pembatas
+ *
+ * Return:
+ *   Tidak ada
+*/
 void printSeparator(char symbol) {
     printf("%s", YELLOW);
     for(int i = 0; i < 12; i++) printf("%c", symbol);
     printf("%s\n", RESET);
 }
 
-// Pesan untuk kembali ke menu utama jika proses pada menu yang dipilih telah selesai dijalankan
+/*
+ * Fungsi waitForEnter:
+ * Fungsi yang akan memberi tahukan perintah untuk melanjutkan program(perpindah untuk memuat menu utama)
+ *
+ * Parameter:
+ *   Tidak ada
+ *
+ * Return:
+ *   Tidak ada
+*/
 void waitForEnter() {
     printf("\n%sTekan Enter untuk melanjutkan...%s", YELLOW, RESET);
     while(getchar() != '\n');
@@ -97,6 +132,18 @@ char* formatCurrency(float amount) {
     return formatted;
 }
 
+/* 
+ * Fungsi validateInput: 
+ * Karena dalam program ini terdapat berbagai macam input, dan agar program bisa berjalan dengan baik
+ * tentu diperlukan validasi apakah data tersebut sesuai dengan kebutuhan pada program
+ * Parameter:
+ *   prompt - Pesan yang memperlihatkan input.
+ *   min  - Minimum nilai yang ditentukan.
+ *   max  - Maximum nilai yang ditentukan.
+ *
+ * Return:
+ *   Nilai yang diinputkan.
+*/
 int validateInput(const char* prompt, int min, int max) {
     int input;
     char line[256];
@@ -118,8 +165,17 @@ int validateInput(const char* prompt, int min, int max) {
     return input;
 }
 
-// Fungsi untuk mendapatkan waktu saat ini
-void getCurrentTime(char *times) {
+/*
+ * Fungsi waitForEnter:
+ * Fungsi untuk mendapatkan waktu saat ini
+ *
+ * Parameter:
+ *   times - pointer ke array char untuk menyimpan string waktu
+ *   (harus memiliki ukuran minimal 25 karakter)
+ *
+ * Return:
+ *   Tidak ada
+*/void getCurrentTime(char *times) {
     time_t now;
     struct tm *tm_info;
 
@@ -128,26 +184,55 @@ void getCurrentTime(char *times) {
     strftime(times, 25, "%Y-%m-%d %H:%M:%S", tm_info);
 }
 
-// Fungsi untuk mendapatkan nomor dari kode buku
-int getNumberFromCode(const char* Code) {
+/*
+ * Fungsi getNumberFromCode:
+ * Mengekstrak dan mengkonversi bagian numerik dari kode buku.
+ * Parameter:
+ *   code - pointer ke string kode buku yang akan diekstrak
+ *
+ * Return:
+ *   Integer hasil konversi dari bagian numerik kode
+*/
+int getNumberFromCode(const char* code) {
     char number[4];
-    strncpy(number, Code + 1, 3); // Mengambil 3 digit setelah 'B'
+    strncpy(number, code + 1, 3); // Mengambil 3 digit setelah 'B'
     number[3] = '\0';
     return atoi(number); // konversi string ke int, sekaligus juga mengembalikan nilai
 }
 
-// Fungsi untuk membuat kode buku baru
+/*
+ * Fungsi createNewCode:
+ * Membuat kode buku baru berdasarkan kode terakhir.
+ *
+ * Parameter:
+ *   lastCode - pointer ke string kode terakhir yang ada
+ *   newCode - pointer ke buffer untuk menyimpan kode baru
+ *
+ * Return:
+ *   Tidak ada
+*/
 void createNewCode(const char* lastCode, char* newCode) {
+    // Kondisi apabila lastcode bertipe null atau array char kosong, akan membuat kode "B001"
     if (lastCode == NULL || lastCode[0] == '\0') {
         strncpy(newCode, "B001", MAX_CODE);
         return;
     }
 
     int number = getNumberFromCode(lastCode);
+    // Increament 1, setiap menambah data baru
     sprintf(newCode, "B%03d", number + 1);
 }
 
-// Fungsi untuk membaca data buku dari file
+/*
+ * Fungsi readDataBook:
+ * Membaca data buku dari file databuku.txt.
+ *
+ * Parameter:
+ *   bookList - pointer ke array struct Book untuk menyimpan data
+ *
+ * Return:
+ *   Jumlah buku yang berhasil dibaca dari file
+*/
 int readDataBook(Book *bookList) {
     FILE *file = fopen("databuku.txt", "r");
     int totalBooks = 0;
@@ -171,8 +256,18 @@ int readDataBook(Book *bookList) {
     return totalBooks;
 }
 
-// Fungsi untuk menambahkan buku kedalam database(file databuku.txt)
+/*
+ * Fungsi addBook:
+ * Menambahkan data buku baru ke dalam sistem dan file(database).
+ * Parameter:
+ *   bookList - pointer ke array struct Book
+ *   totalBooks - pointer ke integer jumlah total buku
+ *
+ * Return:
+ *   Tidak ada
+*/
 void addBook(Book *bookList, int *totalBooks) {
+    // Kondisi untuk mengetahui batas maksimal buku
     if (*totalBooks >= MAX_BOOKS) {
         printHeader("Penyimpanan Toko penuh!");
         return;
@@ -222,8 +317,18 @@ void addBook(Book *bookList, int *totalBooks) {
     printf("Buku berhasil ditambahkan dengan kode: %s\n", newBook.code);
 }
 
-// Fungsi untuk menyimpan data buku ke file
+/*
+ * Fungsi saveBookToFile:
+ * Menyimpan data buku spesific ke dalam file databuku.txt.
+ *
+ * Parameter:
+ *   book - pointer ke struct Book yang akan disimpan
+ *
+ * Return:
+ *   Tidak ada
+*/
 void saveBookToFile(const Book* book) {
+    // Dalam membaca file databuku, disini menggunakan mode a (Append) dalam kasus ini ingin menambahkan data pada line terakhir
     FILE* file = fopen("databuku.txt", "a");
     if (file == NULL) {
         printf("Error: Tidak dapat membuka file!\n");
@@ -234,7 +339,18 @@ void saveBookToFile(const Book* book) {
     fclose(file);
 }
 
-// Core functionality implementation
+/*
+ * Fungsi inputTransaction:
+ * Memproses transaksi pembelian buku.
+ * Mencari buku berdasarkan kode dan menghitung total pembelian.
+ *
+ * Parameter:
+ *   bookList - pointer ke array struct Book
+ *   totalBooks - jumlah total buku dalam sistem
+ *
+ * Return:
+ *   Tidak ada
+*/
 void inputTransaction(Book *bookList, int totalBooks) {
     printHeader("INPUT TRANSAKSI");
     
@@ -249,26 +365,40 @@ void inputTransaction(Book *bookList, int totalBooks) {
             printf("Nama: %s\n", bookList[i].name);
             printf("Harga: %s\n", formatCurrency(bookList[i].price));
             
+            // Input jumlah buku, dan validasi input diantar batas yang ditentukan
             int quantity = validateInput("Masukkan jumlah buku: ", 1, 100);
             
             Transaction trans;
 
+            // Untuk mendapatkan waktu saat ini
             getCurrentTime(trans.time);
             strcpy(trans.codeBook, bookList[i].code);
             strcpy(trans.nameBook, bookList[i].name);
             trans.quantity = quantity;
             trans.total = bookList[i].price * quantity;
 
+            // Menyimpan transaksi kedalam file
             saveTransactionToFile(&trans);
             
             return;
         }
     }
+
     printf("%sBuku tidak ditemukan!%s\n", RED, RESET);
 }
 
-// Fungsi untuk menyimpan data history ke file
+/*
+ * Fungsi saveTransactionToFile:
+ * Menyimpan data transaksi ke dalam file history.txt.
+ *
+ * Parameter:
+ *   trans - pointer ke struct Transaction yang akan disimpan
+ *
+ * Return:
+ *   Tidak ada
+*/
 void saveTransactionToFile(const Transaction* trans) {
+    // Dalam membaca file history, disini menggunakan mode a (Append) dalam kasus ini ingin menambahkan data pada line terakhir
     FILE *file = fopen("history.txt", "a");
     if (file) {
         fprintf(file, "%s,%s,%s,%d,%.2f\n",
@@ -284,6 +414,17 @@ void saveTransactionToFile(const Transaction* trans) {
     }
 }
 
+
+/*
+ * Fungsi printMenu:
+ * Mempermudah dalam dalam membaca dan maintenance kode
+ *
+ * Parameter:
+ *   trans - pointer ke struct Transaction yang akan disimpan
+ *
+ * Return:
+ *   Tidak ada
+*/
 void printMenu() {
     printf("\n%s===== APLIKASI TOKO BUKU =====%s\n", MAGENTA, RESET);
     printSeparator('-');
@@ -308,8 +449,8 @@ int main() {
 
         switch (choice) {
             case 1: addBook(bookList, &totalBooks); break;
-            // case 2: view_history(); break;
             // Todo: Menambahkan menu yang belum ada
+            // view_history();
             // view_book;
             // delete_history;
             // delete_book;
@@ -318,7 +459,7 @@ int main() {
                 printHeader("TERIMA KASIH");
                 printf("%sTerima kasih telah menggunakan aplikasi!%s\n\n", GREEN, RESET);
                 return 0;
-            // Menu 7 ini inisiatif dari kelompok kami, dikarenakan didalam soal tidak ada perintah untuk input trasaksi
+            // Menu 7 ini inisiatif dari kelompok kami, dikarenakan didalam soal tidak ada perintah untuk input transaksi
             // memiliki kemungkinan tidak akan adanya update data transaksi terjadi.
             case 7: inputTransaction(bookList, totalBooks); break;
             default: 
