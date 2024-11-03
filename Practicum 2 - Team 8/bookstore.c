@@ -6,28 +6,30 @@
 
 // ANSI Color codes untuk terminal
 // Untuk memperindah output pada terminal, memberikan warna pada text output
-#define RESET   "\x1B[0m"
-#define RED     "\x1B[31m"
-#define GREEN   "\x1B[32m"
-#define YELLOW  "\x1B[33m"
-#define BLUE    "\x1B[34m"
+#define RESET "\x1B[0m"
+#define RED "\x1B[31m"
+#define GREEN "\x1B[32m"
+#define YELLOW "\x1B[33m"
+#define BLUE "\x1B[34m"
 #define MAGENTA "\x1B[35m"
-#define CYAN    "\x1B[36m"
-#define WHITE   "\x1B[37m"
+#define CYAN "\x1B[36m"
+#define WHITE "\x1B[37m"
 
 #define MAX_BOOKS 100
 #define MAX_STRING 100
 #define MAX_CODE 5
 #define CURRENCY "Rp"
 
-typedef struct {
+typedef struct
+{
     char code[MAX_CODE];
     char name[MAX_STRING];
     char type[MAX_STRING];
     float price;
 } Book;
 
-typedef struct {
+typedef struct
+{
     char time[25];
     char codeBook[10];
     char nameBook[MAX_STRING];
@@ -37,19 +39,19 @@ typedef struct {
 
 // Fungsi prototype
 void clearScreen();
-void printHeader(const char* title);
+void printHeader(const char *title);
 void printSeparator(char symbol);
 void printMenu();
 void waitForEnter();
-char* formatCurrency(float amount);
-int getNumberFromCode(const char* Code);
-int validateInput(const char* prompt, int min, int max);
+char *formatCurrency(float amount);
+int getNumberFromCode(const char *Code);
+int validateInput(const char *prompt, int min, int max);
 
 // Fungsi file handling
 int readDataBook(Book *bookList);
 void saveDataBook(const Book *bookList, int totalBooks);
 void saveBookToFile(const Book *book);
-void saveTransactionToFile(const Transaction* trans);
+void saveTransactionToFile(const Transaction *trans);
 void getCurrentTime(char *time);
 
 // Core functionality
@@ -60,18 +62,19 @@ void addBook(Book *bookList, int *totalBooks);
  * Fungsi clearScreen:
  * Membersihkan output pada layar konsol sehingga memberikan tampilan yang lebih rapi.
  *
- * Parameter: 
+ * Parameter:
  *   Tidak ada
  *
  * Return:
  *   Tidak ada
-*/
-void clearScreen() {
-    #ifdef _WIN32
-        system("cls");
-    #else
-        system("clear");
-    #endif
+ */
+void clearScreen()
+{
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
 }
 
 /*
@@ -83,8 +86,9 @@ void clearScreen() {
  *
  * Return:
  *   Tidak ada
-*/
-void printHeader(const char* title) {
+ */
+void printHeader(const char *title)
+{
     clearScreen();
     printSeparator('=');
     printf("%s%s%s\n", CYAN, title, RESET);
@@ -101,10 +105,12 @@ void printHeader(const char* title) {
  *
  * Return:
  *   Tidak ada
-*/
-void printSeparator(char symbol) {
+ */
+void printSeparator(char symbol)
+{
     printf("%s", YELLOW);
-    for(int i = 0; i < 12; i++) printf("%c", symbol);
+    for (int i = 0; i < 12; i++)
+        printf("%c", symbol);
     printf("%s\n", RESET);
 }
 
@@ -117,23 +123,26 @@ void printSeparator(char symbol) {
  *
  * Return:
  *   Tidak ada
-*/
-void waitForEnter() {
+ */
+void waitForEnter()
+{
     printf("\n%sTekan Enter untuk melanjutkan...%s", YELLOW, RESET);
-    while(getchar() != '\n');
+    while (getchar() != '\n')
+        ;
     getchar();
     clearScreen();
 }
 
 // Menuliskan nominal uang dengan mengikuti format mata uang Indonesia
-char* formatCurrency(float amount) {
+char *formatCurrency(float amount)
+{
     static char formatted[32];
     sprintf(formatted, "%s %.2f", CURRENCY, amount);
     return formatted;
 }
 
-/* 
- * Fungsi validateInput: 
+/*
+ * Fungsi validateInput:
  * Karena dalam program ini terdapat berbagai macam input, dan agar program bisa berjalan dengan baik
  * tentu diperlukan validasi apakah data tersebut sesuai dengan kebutuhan pada program
  * Parameter:
@@ -143,20 +152,25 @@ char* formatCurrency(float amount) {
  *
  * Return:
  *   Nilai yang diinputkan.
-*/
-int validateInput(const char* prompt, int min, int max) {
+ */
+int validateInput(const char *prompt, int min, int max)
+{
     int input;
     char line[256];
-    do {
+    do
+    {
         printf("%s", prompt);
-        if (!fgets(line, sizeof(line), stdin)) {
+        if (!fgets(line, sizeof(line), stdin))
+        {
             return min - 1;
         }
-        if (sscanf(line, "%d", &input) != 1) {
+        if (sscanf(line, "%d", &input) != 1)
+        {
             printf("%sInput tidak valid!%s\n", RED, RESET);
             continue;
         }
-        if (input < min || input > max) {
+        if (input < min || input > max)
+        {
             printf("%sInput harus antara %d dan %d!%s\n", RED, min, max, RESET);
             continue;
         }
@@ -175,7 +189,9 @@ int validateInput(const char* prompt, int min, int max) {
  *
  * Return:
  *   Tidak ada
-*/void getCurrentTime(char *times) {
+ */
+void getCurrentTime(char *times)
+{
     time_t now;
     struct tm *tm_info;
 
@@ -192,8 +208,9 @@ int validateInput(const char* prompt, int min, int max) {
  *
  * Return:
  *   Integer hasil konversi dari bagian numerik kode
-*/
-int getNumberFromCode(const char* code) {
+ */
+int getNumberFromCode(const char *code)
+{
     char number[4];
     strncpy(number, code + 1, 3); // Mengambil 3 digit setelah 'B'
     number[3] = '\0';
@@ -210,10 +227,12 @@ int getNumberFromCode(const char* code) {
  *
  * Return:
  *   Tidak ada
-*/
-void createNewCode(const char* lastCode, char* newCode) {
+ */
+void createNewCode(const char *lastCode, char *newCode)
+{
     // Kondisi apabila lastcode bertipe null atau array char kosong, akan membuat kode "B001"
-    if (lastCode == NULL || lastCode[0] == '\0') {
+    if (lastCode == NULL || lastCode[0] == '\0')
+    {
         strncpy(newCode, "B001", MAX_CODE);
         return;
     }
@@ -232,26 +251,30 @@ void createNewCode(const char* lastCode, char* newCode) {
  *
  * Return:
  *   Jumlah buku yang berhasil dibaca dari file
-*/
-int readDataBook(Book *bookList) {
+ */
+int readDataBook(Book *bookList)
+{
     FILE *file = fopen("databuku.txt", "r");
     int totalBooks = 0;
-    
-    if (file == NULL) {
+
+    if (file == NULL)
+    {
         printf("%sFile databuku.txt tidak ditemukan!%s\n", RED, RESET);
         return 0;
     }
-    
-    while (!feof(file) && totalBooks < MAX_BOOKS) {
-        if (fscanf(file, "%[^,],%[^,],%[^,],%f\n", 
-               bookList[totalBooks].code,
-               bookList[totalBooks].name,
-               bookList[totalBooks].type,
-               &bookList[totalBooks].price) == 4) {
+
+    while (!feof(file) && totalBooks < MAX_BOOKS)
+    {
+        if (fscanf(file, "%[^,],%[^,],%[^,],%f\n",
+                   bookList[totalBooks].code,
+                   bookList[totalBooks].name,
+                   bookList[totalBooks].type,
+                   &bookList[totalBooks].price) == 4)
+        {
             totalBooks++;
         }
     }
-    
+
     fclose(file);
     return totalBooks;
 }
@@ -265,10 +288,58 @@ int readDataBook(Book *bookList) {
  *
  * Return:
  *   Tidak ada
-*/
-void addBook(Book *bookList, int *totalBooks) {
+ */
+
+void list_book()
+{
+    FILE *file;
+    char data[100];
+
+    // Membuka File databuku.txt
+    file = fopen("databuku.txt", "r");
+    
+    // Cek kondisi jika file ada atau tidak
+    if (file == NULL)
+    {
+        printf("Terjadi kesalahan saat membuka file \n");
+    }
+
+    Book book;
+
+    while (fgets(data, sizeof(data), file))
+    {
+        // Memilah dan menyimpan data buku ke dalam buffer
+        sscanf(data, "%[^,],%[^,],%[^,],%f", book.code, book.name, book.type, &book.price);
+
+        // Menampilkan data yang telah dipilah
+        printf("Kode Buku   : %s\n", book.code);
+        printf("Nama       : %s\n", book.name);
+        printf("Jenis    : %s\n", book.type);
+        printf("Harga       : %.2f\n", book.price);
+        printf("-------------------------\n");
+    }
+
+    // Menutup File
+    fclose(file);
+}
+
+/*
+ * Fungsi list_buku:
+ * Menampilkan data buku dari file databuku.txt.
+ *
+ * Parameter:
+ *   Tidak Ada
+ *
+ * Return:
+ *   Tidak ada
+ */
+
+
+void addBook(Book *bookList, int *totalBooks)
+{
     // Kondisi untuk mengetahui batas maksimal buku
-    if (*totalBooks >= MAX_BOOKS) {
+    if (*totalBooks >= MAX_BOOKS)
+    {
         printHeader("Penyimpanan Toko penuh!");
         return;
     }
@@ -276,33 +347,42 @@ void addBook(Book *bookList, int *totalBooks) {
     Book newBook;
 
     // Membuat kode buku otomatis
-    if (totalBooks == 0) {
+    if (totalBooks == 0)
+    {
         createNewCode("", newBook.code);
-    } else {
-        createNewCode(bookList[*totalBooks-1].code, newBook.code);
+    }
+    else
+    {
+        createNewCode(bookList[*totalBooks - 1].code, newBook.code);
     }
 
     printf("\n=== Input Data Buku ===\n");
     printf("Kode Buku: %s\n", newBook.code);
 
     // Input nama buku - pastikan buffer bersih
-    while (getchar() != '\n'); // Membersihkan buffer dengan lebih aman
+    while (getchar() != '\n')
+        ; // Membersihkan buffer dengan lebih aman
     printf("Nama Buku: ");
-    if (fgets(newBook.name, sizeof(newBook.name), stdin) != NULL) {
+    if (fgets(newBook.name, sizeof(newBook.name), stdin) != NULL)
+    {
         newBook.name[strcspn(newBook.name, "\n")] = 0;
     }
     // Input jenis buku
     printf("Jenis Buku: ");
-    if (fgets(newBook.type, sizeof(newBook.type), stdin) != NULL) {
+    if (fgets(newBook.type, sizeof(newBook.type), stdin) != NULL)
+    {
         newBook.type[strcspn(newBook.type, "\n")] = 0;
     }
 
     // Input harga buku
-    do {
+    do
+    {
         printf("Harga Buku: ");
-        if (scanf("%f", &newBook.price) != 1 || newBook.price <= 0) {
+        if (scanf("%f", &newBook.price) != 1 || newBook.price <= 0)
+        {
             printf("%sHarga tidak valid!%s\n", RED, RESET);
-            while (getchar() != '\n');
+            while (getchar() != '\n')
+                ;
             continue;
         }
         break;
@@ -326,24 +406,27 @@ void addBook(Book *bookList, int *totalBooks) {
  *
  * Return:
  *   Tidak ada
-*/
-void saveBookToFile(const Book* book) {
+ */
+void saveBookToFile(const Book *book)
+{
     // Dalam membaca file databuku, disini menggunakan mode a (Append) dalam kasus ini ingin menambahkan data pada line terakhir
-    FILE* file = fopen("databuku.txt", "a");
-    if (file == NULL) {
+    FILE *file = fopen("databuku.txt", "a");
+    if (file == NULL)
+    {
         printf("Error: Tidak dapat membuka file!\n");
         return;
     }
-    
+
     fprintf(file, "%s,%s,%s,%.2f\n", book->code, book->name, book->type, book->price);
     fclose(file);
 }
 
-
 // fungsi untuk viewHistory
-void viewHistory() {
+void viewHistory()
+{
     FILE *file = fopen("history.txt", "r");
-    if (file == NULL) {
+    if (file == NULL)
+    {
         printf("%sBelum terdapat transaksi!  (file history.txt not found)%s\n", RED, RESET);
         return;
     }
@@ -354,14 +437,15 @@ void viewHistory() {
     printf("%-20s %-10s %-30s %-10s %-10s\n", "Waktu", "Kode Buku", "Nama Buku", "Jumlah", "Total");
     printSeparator('-');
 
-    while (fgets(line, sizeof(line), file)) {
+    while (fgets(line, sizeof(line), file))
+    {
         char time[25], codeBook[10], nameBook[MAX_STRING];
         int quantity;
         float total;
 
         // sscanf untuk memiliah data dari line
         sscanf(line, "%[^,],%[^,],%[^,],%d,%f", time, codeBook, nameBook, &quantity, &total);
-        
+
         // mnampilkan data yang telah dipilah
         printf("%-20s %-10s %-30s %-10d %-10s\n", time, codeBook, nameBook, quantity, formatCurrency(total));
     }
@@ -370,11 +454,12 @@ void viewHistory() {
     printSeparator('-');
 }
 
-
 // fungsi untuk deleteHistory
-void deleteHistory() {
+void deleteHistory()
+{
     FILE *file = fopen("history.txt", "r");
-    if (file == NULL) {
+    if (file == NULL)
+    {
         printf("%sBelum terdapat transaksi!  (file history.txt not found)%s\n", RED, RESET);
         return;
     }
@@ -383,7 +468,8 @@ void deleteHistory() {
     char lines[100][256]; // bisa disesuaikan sesuai kebutuhan
     int count = 0;
 
-    while (fgets(lines[count], sizeof(lines[count]), file) && count < 100) {
+    while (fgets(lines[count], sizeof(lines[count]), file) && count < 100)
+    {
         count++;
     }
     fclose(file);
@@ -394,7 +480,8 @@ void deleteHistory() {
     printf("%-3s %-20s %-10s %-30s %-10s %-10s\n", "No", "Waktu", "Kode Buku", "Nama Buku", "Jumlah", "Total");
     printSeparator('-');
 
-    for (int i = 0; i < count; i++) {
+    for (int i = 0; i < count; i++)
+    {
         char time[25], codeBook[10], nameBook[MAX_STRING];
         int quantity;
         float total;
@@ -406,12 +493,14 @@ void deleteHistory() {
     // Meminta input index untuk dihapus
     char input[10];
     int index = 0;
-    while (1) {
+    while (1)
+    {
         printf("Nomor index yang dihapus: ");
         fgets(input, sizeof(input), stdin);
-        
+
         // Cek apakah input kosong
-        if (input[0] == '\n') {
+        if (input[0] == '\n')
+        {
             printf("%sInput tidak valid!%s\n", RED, RESET);
             continue;
         }
@@ -420,17 +509,22 @@ void deleteHistory() {
         index = atoi(input);
 
         // validasi input
-        if (index >= 1 && index <= count) {
+        if (index >= 1 && index <= count)
+        {
             break; // Input valid
-        } else {
+        }
+        else
+        {
             printf("%sInput tidak valid!%s\n", RED, RESET);
         }
     }
 
     // menghapus data sesuai index yang dipilih
     file = fopen("history.txt", "w"); // Membuka file untuk menulis ulang
-    for (int i = 0; i < count; i++) {
-        if (i != index - 1) { // jika bukan index yang dihapus
+    for (int i = 0; i < count; i++)
+    {
+        if (i != index - 1)
+        { // jika bukan index yang dihapus
             fprintf(file, "%s", lines[i]);
         }
     }
@@ -450,24 +544,27 @@ void deleteHistory() {
  *
  * Return:
  *   Tidak ada
-*/
-void inputTransaction(Book *bookList, int totalBooks) {
+ */
+void inputTransaction(Book *bookList, int totalBooks)
+{
     printHeader("INPUT TRANSAKSI");
-    
+
     char codeBook[10];
     printf("%sMasukkan kode buku: %s", GREEN, RESET);
     scanf("%s", codeBook);
-    getchar();  // Clear buffer
-    
-    for (int i = 0; i < totalBooks; i++) {
-        if (strcmp(bookList[i].code, codeBook) == 0) {
+    getchar(); // Clear buffer
+
+    for (int i = 0; i < totalBooks; i++)
+    {
+        if (strcmp(bookList[i].code, codeBook) == 0)
+        {
             printf("\n%sDATA BUKU:%s\n", CYAN, RESET);
             printf("Nama: %s\n", bookList[i].name);
             printf("Harga: %s\n", formatCurrency(bookList[i].price));
-            
+
             // Input jumlah buku, dan validasi input diantar batas yang ditentukan
             int quantity = validateInput("Masukkan jumlah buku: ", 1, 100);
-            
+
             Transaction trans;
 
             // Untuk mendapatkan waktu saat ini
@@ -479,7 +576,7 @@ void inputTransaction(Book *bookList, int totalBooks) {
 
             // Menyimpan transaksi kedalam file
             saveTransactionToFile(&trans);
-            
+
             return;
         }
     }
@@ -496,24 +593,27 @@ void inputTransaction(Book *bookList, int totalBooks) {
  *
  * Return:
  *   Tidak ada
-*/
-void saveTransactionToFile(const Transaction* trans) {
+ */
+void saveTransactionToFile(const Transaction *trans)
+{
     // Dalam membaca file history, disini menggunakan mode a (Append) dalam kasus ini ingin menambahkan data pada line terakhir
     FILE *file = fopen("history.txt", "a");
-    if (file) {
+    if (file)
+    {
         fprintf(file, "%s,%s,%s,%d,%.2f\n",
                 trans->time, trans->codeBook, trans->nameBook,
                 trans->quantity, trans->total);
         fclose(file);
-        
+
         printf("\n%sTransaksi Berhasil!%s\n", GREEN, RESET);
-        printf("Total pembayaran: %s%s%s\n", 
-                GREEN, formatCurrency(trans->total), RESET);
-    } else {
+        printf("Total pembayaran: %s%s%s\n",
+               GREEN, formatCurrency(trans->total), RESET);
+    }
+    else
+    {
         printf("%sGagal menyimpan transaksi!%s\n", RED, RESET);
     }
 }
-
 
 /*
  * Fungsi printMenu:
@@ -524,8 +624,9 @@ void saveTransactionToFile(const Transaction* trans) {
  *
  * Return:
  *   Tidak ada
-*/
-void printMenu() {
+ */
+void printMenu()
+{
     printf("\n%s===== APLIKASI TOKO BUKU =====%s\n", MAGENTA, RESET);
     printSeparator('-');
     printf("%s1.%s Input Buku\n", CYAN, RESET);
@@ -538,35 +639,49 @@ void printMenu() {
     printSeparator('-');
 }
 
-int main() {
+int main()
+{
     Book bookList[MAX_BOOKS];
     int totalBooks = readDataBook(bookList);
     int choice;
-    
-    do{
+
+    do
+    {
         printMenu();
         scanf("%d", &choice);
 
-        switch (choice) {
-            case 1: addBook(bookList, &totalBooks); break;
-            // Todo: Menambahkan menu yang belum ada
-            case 2: viewHistory(); break; 
-            // History: Menampilkan history Transaksi
-            // view_book;
-            case 4: deleteHistory(); break;
-            // Detele History:  Menghapus history Transaksi berdasarkan index
-            // delete_book;
-            case 6:
-                clearScreen();
-                printHeader("TERIMA KASIH");
-                printf("%sTerima kasih telah menggunakan aplikasi!%s\n\n", GREEN, RESET);
-                return 0;
-            // Menu 7 ini inisiatif dari kelompok kami, dikarenakan didalam soal tidak ada perintah untuk input transaksi
-            // Terdapat kemungkinan tidak akan adanya update data transaksi terjadi.
-            case 7: inputTransaction(bookList, totalBooks); break;
-            default: 
-                printf("Menu yang anda masukan tidak tersedia!!");
-                break;
+        switch (choice)
+        {
+        case 1:
+            addBook(bookList, &totalBooks);
+            break;
+        // Todo: Menambahkan menu yang belum ada
+        case 2:
+            viewHistory();
+            break;
+        // History: Menampilkan history Transaksi
+        // view_book;
+        case 3:
+            list_book();
+            break;
+        case 4:
+            deleteHistory();
+            break;
+        // Detele History:  Menghapus history Transaksi berdasarkan index
+        // delete_book;
+        case 6:
+            clearScreen();
+            printHeader("TERIMA KASIH");
+            printf("%sTerima kasih telah menggunakan aplikasi!%s\n\n", GREEN, RESET);
+            return 0;
+        // Menu 7 ini inisiatif dari kelompok kami, dikarenakan didalam soal tidak ada perintah untuk input transaksi
+        // Terdapat kemungkinan tidak akan adanya update data transaksi terjadi.
+        case 7:
+            inputTransaction(bookList, totalBooks);
+            break;
+        default:
+            printf("Menu yang anda masukan tidak tersedia!!");
+            break;
         }
 
         waitForEnter();
