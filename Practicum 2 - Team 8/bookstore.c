@@ -234,6 +234,56 @@ void saveBookToFile(const Book* book) {
     fclose(file);
 }
 
+// Core functionality implementation
+void inputTransaction(Book *bookList, int totalBooks) {
+    printHeader("INPUT TRANSAKSI");
+    
+    char codeBook[10];
+    printf("%sMasukkan kode buku: %s", GREEN, RESET);
+    scanf("%s", codeBook);
+    getchar();  // Clear buffer
+    
+    for (int i = 0; i < totalBooks; i++) {
+        if (strcmp(bookList[i].code, codeBook) == 0) {
+            printf("\n%sDATA BUKU:%s\n", CYAN, RESET);
+            printf("Nama: %s\n", bookList[i].name);
+            printf("Harga: %s\n", formatCurrency(bookList[i].price));
+            
+            int quantity = validateInput("Masukkan jumlah buku: ", 1, 100);
+            
+            Transaction trans;
+
+            getCurrentTime(trans.time);
+            strcpy(trans.codeBook, bookList[i].code);
+            strcpy(trans.nameBook, bookList[i].name);
+            trans.quantity = quantity;
+            trans.total = bookList[i].price * quantity;
+
+            saveTransactionToFile(&trans);
+            
+            return;
+        }
+    }
+    printf("%sBuku tidak ditemukan!%s\n", RED, RESET);
+}
+
+// Fungsi untuk menyimpan data history ke file
+void saveTransactionToFile(const Transaction* trans) {
+    FILE *file = fopen("history.txt", "a");
+    if (file) {
+        fprintf(file, "%s,%s,%s,%d,%.2f\n",
+                trans->time, trans->codeBook, trans->nameBook,
+                trans->quantity, trans->total);
+        fclose(file);
+        
+        printf("\n%sTransaksi Berhasil!%s\n", GREEN, RESET);
+        printf("Total pembayaran: %s%s%s\n", 
+                GREEN, formatCurrency(trans->total), RESET);
+    } else {
+        printf("%sGagal menyimpan transaksi!%s\n", RED, RESET);
+    }
+}
+
 void printMenu() {
     printf("\n%s===== APLIKASI TOKO BUKU =====%s\n", MAGENTA, RESET);
     printSeparator('-');
@@ -268,6 +318,9 @@ int main() {
                 printHeader("TERIMA KASIH");
                 printf("%sTerima kasih telah menggunakan aplikasi!%s\n\n", GREEN, RESET);
                 return 0;
+            // Menu 7 ini inisiatif dari kelompok kami, dikarenakan didalam soal tidak ada perintah untuk input trasaksi
+            // memiliki kemungkinan tidak akan adanya update data transaksi terjadi.
+            case 7: inputTransaction(bookList, totalBooks); break;
             default: 
                 printf("Menu yang anda masukan tidak tersedia!!");
                 break;
