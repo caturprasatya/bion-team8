@@ -97,6 +97,56 @@ char* formatCurrency(float amount) {
     return formatted;
 }
 
+int validateInput(const char* prompt, int min, int max) {
+    int input;
+    char line[256];
+    do {
+        printf("%s", prompt);
+        if (!fgets(line, sizeof(line), stdin)) {
+            return min - 1;
+        }
+        if (sscanf(line, "%d", &input) != 1) {
+            printf("%sInput tidak valid!%s\n", RED, RESET);
+            continue;
+        }
+        if (input < min || input > max) {
+            printf("%sInput harus antara %d dan %d!%s\n", RED, min, max, RESET);
+            continue;
+        }
+        break;
+    } while (1);
+    return input;
+}
+
+// Fungsi untuk mendapatkan waktu saat ini
+void getCurrentTime(char *times) {
+    time_t now;
+    struct tm *tm_info;
+
+    time(&now);
+    tm_info = localtime(&now);
+    strftime(times, 25, "%Y-%m-%d %H:%M:%S", tm_info);
+}
+
+// Fungsi untuk mendapatkan nomor dari kode buku
+int getNumberFromCode(const char* Code) {
+    char number[4];
+    strncpy(number, Code + 1, 3); // Mengambil 3 digit setelah 'B'
+    number[3] = '\0';
+    return atoi(number); // konversi string ke int, sekaligus juga mengembalikan nilai
+}
+
+// Fungsi untuk membuat kode buku baru
+void createNewCode(const char* lastCode, char* newCode) {
+    if (lastCode == NULL || lastCode[0] == '\0') {
+        strncpy(newCode, "B001", MAX_CODE);
+        return;
+    }
+
+    int number = getNumberFromCode(lastCode);
+    sprintf(newCode, "B%03d", number + 1);
+}
+
 // Fungsi untuk membaca data buku dari file
 int readDataBook(Book *bookList) {
     FILE *file = fopen("databuku.txt", "r");
@@ -119,6 +169,69 @@ int readDataBook(Book *bookList) {
     
     fclose(file);
     return totalBooks;
+}
+
+// Fungsi untuk menambahkan buku kedalam database(file databuku.txt)
+void addBook(Book *bookList, int *totalBooks) {
+    if (*totalBooks >= MAX_BOOKS) {
+        printHeader("Penyimpanan Toko penuh!");
+        return;
+    }
+
+    Book newBook;
+
+    // Membuat kode buku otomatis
+    if (totalBooks == 0) {
+        createNewCode("", newBook.code);
+    } else {
+        createNewCode(bookList[*totalBooks-1].code, newBook.code);
+    }
+
+    printf("\n=== Input Data Buku ===\n");
+    printf("Kode Buku: %s\n", newBook.code);
+
+    // Input nama buku - pastikan buffer bersih
+    while (getchar() != '\n'); // Membersihkan buffer dengan lebih aman
+    printf("Nama Buku: ");
+    if (fgets(newBook.name, sizeof(newBook.name), stdin) != NULL) {
+        newBook.name[strcspn(newBook.name, "\n")] = 0;
+    }
+    // Input jenis buku
+    printf("Jenis Buku: ");
+    if (fgets(newBook.type, sizeof(newBook.type), stdin) != NULL) {
+        newBook.type[strcspn(newBook.type, "\n")] = 0;
+    }
+
+    // Input harga buku
+    do {
+        printf("Harga Buku: ");
+        if (scanf("%f", &newBook.price) != 1 || newBook.price <= 0) {
+            printf("%sHarga tidak valid!%s\n", RED, RESET);
+            while (getchar() != '\n');
+            continue;
+        }
+        break;
+    } while (1);
+
+    // Menambahkan buku ke array
+    bookList[*totalBooks] = newBook;
+    (*totalBooks)++;
+
+    // Simpan ke file
+    saveBookToFile(&newBook);
+    printf("Buku berhasil ditambahkan dengan kode: %s\n", newBook.code);
+}
+
+// Fungsi untuk menyimpan data buku ke file
+void saveBookToFile(const Book* book) {
+    FILE* file = fopen("databuku.txt", "a");
+    if (file == NULL) {
+        printf("Error: Tidak dapat membuka file!\n");
+        return;
+    }
+    
+    fprintf(file, "%s,%s,%s,%.2f\n", book->code, book->name, book->type, book->price);
+    fclose(file);
 }
 
 void printMenu() {
@@ -155,9 +268,6 @@ int main() {
                 printHeader("TERIMA KASIH");
                 printf("%sTerima kasih telah menggunakan aplikasi!%s\n\n", GREEN, RESET);
                 return 0;
-            // Menu 7 ini inisiatif dari kelompok kami, dikarenakan didalam soal tidak ada perintah untuk input trasaksi
-            // memiliki kemungkinan tidak akan adanya update data transaksi terjadi.
-            case 7: inputTransaction(bookList, totalBooks); break;
             default: 
                 printf("Menu yang anda masukan tidak tersedia!!");
                 break;
