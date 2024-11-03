@@ -1,0 +1,20 @@
+B001,Laskar Pelangi,Fiksi,85000.00
+B002,Clean Code,Komputer,245000.00
+B003,Atomic Habits,Pengembangan Diri,115000.00
+B004,Harry Potter dan Batu Bertuah,Fiksi,125000.00
+B005,Rich Dad Poor Dad,Bisnis,98000.00
+B006,Sapiens,Sejarah,168000.00
+B007,The Psychology of Money,Bisnis,110000.00
+B008,Filosofi Teras,Filsafat,89000.00
+B009,Mindset: The New Psychology of Success,Pengembangan Diri,135000.00
+B010,Bumi Manusia,Fiksi,82000.00
+B011,Python Crash Course,Komputer,280000.00
+B012,The Midnight Library,Fiksi,115000.00
+B013,Thinking Fast and Slow,Psikologi,175000.00
+B014,Educated,Biografi,145000.00
+B015,Laut Bercerita,Fiksi,98000.00
+B016,The Design of Everyday Things,Desain,195000.00
+B017,Start With Why,Bisnis,125000.00
+B018,JavaScript: The Good Parts,Komputer,210000.00
+B019,Ikigai,Pengembangan Diri,95000.00
+B020,1984,Fiksi,92000.00
