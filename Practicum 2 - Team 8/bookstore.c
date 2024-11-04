@@ -49,7 +49,6 @@ int validateInput(const char *prompt, int min, int max);
 
 // Fungsi file handling
 int readDataBook(Book *bookList);
-void saveDataBook(const Book *bookList, int totalBooks);
 void saveBookToFile(const Book *book);
 void saveTransactionToFile(const Transaction *trans);
 void getCurrentTime(char *time);
@@ -110,7 +109,7 @@ void printHeader(const char *title)
 void printSeparator(char symbol)
 {
     printf("%s", YELLOW);
-    for (int i = 0; i < 20; i++)
+    for (int i = 0; i < 30; i++)
         printf("%c", symbol);
     printf("%s\n", RESET);
 }
@@ -128,8 +127,7 @@ void printSeparator(char symbol)
 void waitForEnter()
 {
     printf("\n%sTekan Enter untuk melanjutkan...%s", YELLOW, RESET);
-    while (getchar() != '\n')
-        ;
+    while (getchar() != '\n');
     getchar();
     clearScreen();
 }
@@ -732,6 +730,7 @@ int main()
     {
         printMenu();
         scanf("%d", &choice);
+        clearScreen();
 
         switch (choice)
         {
