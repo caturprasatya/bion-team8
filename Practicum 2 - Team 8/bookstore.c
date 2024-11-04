@@ -290,7 +290,7 @@ int readDataBook(Book *bookList)
  * Return:
  *   Tidak ada
  */
-void list_book()
+void listBook()
 {
     FILE *file;
     char data[100];
@@ -419,8 +419,15 @@ void saveBookToFile(const Book *book)
     fclose(file);
 }
 
-// fungsi untuk viewHistory
-void viewHistory()
+/*
+ * Fungsi viewHistory:
+ * Menampilkan history Transaksi.
+ * Parameter:
+ *   Tidak ada
+ * Return:
+ *   Tidak ada
+ */
+ void viewHistory()
 {
     FILE *file = fopen("history.txt", "r");
     if (file == NULL)
@@ -452,8 +459,14 @@ void viewHistory()
     printSeparator('-');
 }
 
-// fungsi untuk deleteHistory
-void deleteHistory()
+/*
+ * Fungsi deleteHistory:
+ * Menghapus history Transaksi berdasarkan index.
+ * Parameter:
+ *   Tidak ada
+ * Return:
+ *   Tidak ada
+ */void deleteHistory()
 {
     FILE *file = fopen("history.txt", "r");
     if (file == NULL)
@@ -656,14 +669,12 @@ int main()
         case 2:
             viewHistory();
             break;
-        // History: Menampilkan history Transaksi
         case 3:
-            list_book();
+            listBook();
             break;
         case 4:
             deleteHistory();
             break;
-        // Detele History:  Menghapus history Transaksi berdasarkan index
         // delete_book;
         case 6:
             clearScreen();
