@@ -279,17 +279,17 @@ int readDataBook(Book *bookList)
     return totalBooks;
 }
 
+
 /*
- * Fungsi addBook:
- * Menambahkan data buku baru ke dalam sistem dan file(database).
+ * Fungsi list_buku:
+ * Menampilkan data buku dari file databuku.txt.
+ *
  * Parameter:
- *   bookList - pointer ke array struct Book
- *   totalBooks - pointer ke integer jumlah total buku
+ *   Tidak Ada
  *
  * Return:
  *   Tidak ada
  */
-
 void list_book()
 {
     FILE *file;
@@ -324,17 +324,15 @@ void list_book()
 }
 
 /*
- * Fungsi list_buku:
- * Menampilkan data buku dari file databuku.txt.
- *
+ * Fungsi addBook:
+ * Menambahkan data buku baru ke dalam sistem dan file(database).
  * Parameter:
- *   Tidak Ada
+ *   bookList - pointer ke array struct Book
+ *   totalBooks - pointer ke integer jumlah total buku
  *
  * Return:
  *   Tidak ada
  */
-
-
 void addBook(Book *bookList, int *totalBooks)
 {
     // Kondisi untuk mengetahui batas maksimal buku
@@ -655,12 +653,10 @@ int main()
         case 1:
             addBook(bookList, &totalBooks);
             break;
-        // Todo: Menambahkan menu yang belum ada
         case 2:
             viewHistory();
             break;
         // History: Menampilkan history Transaksi
-        // view_book;
         case 3:
             list_book();
             break;
