@@ -6,7 +6,6 @@ B005,Rich Dad Poor Dad,Bisnis,98000.00
 B006,Sapiens,Sejarah,168000.00
 B007,The Psychology of Money,Bisnis,110000.00
 B008,Filosofi Teras,Filsafat,89000.00
-B009,Mindset: The New Psychology of Success,Pengembangan Diri,135000.00
 B010,Bumi Manusia,Fiksi,82000.00
 B011,Python Crash Course,Komputer,280000.00
 B012,The Midnight Library,Fiksi,115000.00

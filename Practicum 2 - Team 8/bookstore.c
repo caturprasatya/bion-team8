@@ -53,10 +53,11 @@ void saveDataBook(const Book *bookList, int totalBooks);
 void saveBookToFile(const Book *book);
 void saveTransactionToFile(const Transaction *trans);
 void getCurrentTime(char *time);
-
-// Core functionality
-void inputTransaction(Book *bookList, int totalBooks);
+void viewHistory(void);
+void viewBooks(const Book *bookList, int totalBooks);
+void deleteHistory(void);
 void addBook(Book *bookList, int *totalBooks);
+void inputTransaction(Book *bookList, int totalBooks);
 
 /*
  * Fungsi clearScreen:
@@ -109,7 +110,7 @@ void printHeader(const char *title)
 void printSeparator(char symbol)
 {
     printf("%s", YELLOW);
-    for (int i = 0; i < 12; i++)
+    for (int i = 0; i < 20; i++)
         printf("%c", symbol);
     printf("%s\n", RESET);
 }
@@ -281,46 +282,34 @@ int readDataBook(Book *bookList)
 
 
 /*
- * Fungsi list_buku:
+ * Fungsi viewBook:
  * Menampilkan data buku dari file databuku.txt.
  *
  * Parameter:
- *   Tidak Ada
+ *   bookList - pointer ke array struct Book
+ *   totalBooks - pointer ke integer jumlah total buku
  *
  * Return:
  *   Tidak ada
  */
-void listBook()
-{
-    FILE *file;
-    char data[100];
-
-    // Membuka File databuku.txt
-    file = fopen("databuku.txt", "r");
+void viewBooks(const Book *bookList, int totalBooks) {
+    printHeader("DAFTAR BUKU");
     
-    // Cek kondisi jika file ada atau tidak
-    if (file == NULL)
-    {
-        printf("Terjadi kesalahan saat membuka file \n");
+    if (totalBooks == 0) {
+        printf("%sTidak ada buku dalam database%s\n", RED, RESET);
+        return;
     }
 
-    Book book;
+    printf("\n%-8s %-30s %-20s %s\n", "Kode", "Nama", "Tipe", "Harga");
+    printSeparator('-');
 
-    while (fgets(data, sizeof(data), file))
-    {
-        // Memilah dan menyimpan data buku ke dalam buffer
-        sscanf(data, "%[^,],%[^,],%[^,],%f", book.code, book.name, book.type, &book.price);
-
-        // Menampilkan data yang telah dipilah
-        printf("Kode Buku   : %s\n", book.code);
-        printf("Nama       : %s\n", book.name);
-        printf("Jenis    : %s\n", book.type);
-        printf("Harga       : %.2f\n", book.price);
-        printf("-------------------------\n");
+    for (int i = 0; i < totalBooks; i++) {
+        printf("%-8s %-30s %-20s %s\n",
+               bookList[i].code,
+               bookList[i].name,
+               bookList[i].type,
+               formatCurrency(bookList[i].price));
     }
-
-    // Menutup File
-    fclose(file);
 }
 
 /*
@@ -358,8 +347,7 @@ void addBook(Book *bookList, int *totalBooks)
     printf("Kode Buku: %s\n", newBook.code);
 
     // Input nama buku - pastikan buffer bersih
-    while (getchar() != '\n')
-        ; // Membersihkan buffer dengan lebih aman
+    while (getchar() != '\n'); // Membersihkan buffer dengan lebih aman
     printf("Nama Buku: ");
     if (fgets(newBook.name, sizeof(newBook.name), stdin) != NULL)
     {
@@ -417,6 +405,90 @@ void saveBookToFile(const Book *book)
 
     fprintf(file, "%s,%s,%s,%.2f\n", book->code, book->name, book->type, book->price);
     fclose(file);
+}
+
+/*
+ * Fungsi deleteBook:
+ * Menghapus buku dari sistem dan memperbarui file databuku.txt
+ * 
+ * Parameter:
+ *   bookList - pointer ke array struct Book
+ *   totalBooks - pointer ke integer jumlah total buku
+ * 
+ * Return:
+ *   Tidak ada
+ */
+void deleteBook(Book *bookList, int *totalBooks) {
+    printHeader("HAPUS BUKU");
+    
+    if (*totalBooks == 0) {
+        printf("%sTidak ada buku dalam database!%s\n", RED, RESET);
+        return;
+    }
+
+    // Menampilkan daftar buku yang tersedia
+    viewBooks(bookList, *totalBooks);
+
+    char codeBook[MAX_CODE];
+    printf("\n%sMasukkan kode buku yang akan dihapus: %s", GREEN, RESET);
+    scanf("%s", codeBook);
+    getchar(); // Clear buffer
+
+    // Mencari buku yang akan dihapus
+    int indexToDelete = -1;
+    for (int i = 0; i < *totalBooks; i++) {
+        if (strcmp(bookList[i].code, codeBook) == 0) {
+            indexToDelete = i;
+            break;
+        }
+    }
+
+    if (indexToDelete == -1) {
+        printf("%sBuku dengan kode %s tidak ditemukan!%s\n", RED, codeBook, RESET);
+        return;
+    }
+
+    // Konfirmasi penghapusan
+    printf("\nAnda akan menghapus buku:\n");
+    printf("Kode  : %s\n", bookList[indexToDelete].code);
+    printf("Nama  : %s\n", bookList[indexToDelete].name);
+    printf("Jenis : %s\n", bookList[indexToDelete].type);
+    printf("Harga : %s\n", formatCurrency(bookList[indexToDelete].price));
+
+    printf("\n%sApakah anda yakin ingin menghapus buku ini? (y/n): %s", YELLOW, RESET);
+    char confirmation;
+    scanf("%c", &confirmation);
+    getchar(); // Clear buffer
+
+    if (tolower(confirmation) != 'y') {
+        printf("%sPenghapusan dibatalkan%s\n", YELLOW, RESET);
+        return;
+    }
+
+    // Menggeser semua elemen setelah index yang dihapus
+    for (int i = indexToDelete; i < *totalBooks - 1; i++) {
+        bookList[i] = bookList[i + 1];
+    }
+    (*totalBooks)--;
+
+    // Memperbarui file databuku.txt
+    FILE *file = fopen("databuku.txt", "w");
+    if (file == NULL) {
+        printf("%sError: Tidak dapat membuka file!%s\n", RED, RESET);
+        return;
+    }
+
+    // Menulis ulang semua data ke file
+    for (int i = 0; i < *totalBooks; i++) {
+        fprintf(file, "%s,%s,%s,%.2f\n",
+                bookList[i].code,
+                bookList[i].name,
+                bookList[i].type,
+                bookList[i].price);
+    }
+    fclose(file);
+
+    printf("%sBuku berhasil dihapus!%s\n", GREEN, RESET);
 }
 
 /*
@@ -670,12 +742,14 @@ int main()
             viewHistory();
             break;
         case 3:
-            listBook();
+            viewBooks(bookList, totalBooks);
             break;
         case 4:
             deleteHistory();
             break;
-        // delete_book;
+        case 5:
+            deleteBook(bookList, &totalBooks);
+            break;
         case 6:
             clearScreen();
             printHeader("TERIMA KASIH");
